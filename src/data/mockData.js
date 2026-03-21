@@ -8,12 +8,12 @@ function buildDate(offsetDays) {
 }
 
 export const mockStudent = {
-  id: 'S2025001',
-  password: 'password123', // dummy only, not used for real auth
-  name: 'Ananya Sharma',
-  rollNo: 'CS2025-041',
-  course: 'B.Tech Computer Science',
-  semester: '4th Semester',
+  id: '25mca10005',
+  password: '1234', // dummy only, not used for real auth
+  name: 'Abhijeet Dey',
+  rollNo: '25MCA10005',
+  course: 'MCA',
+  semester: '2th Semester',
 };
 
 export const mockExams = [
@@ -93,6 +93,8 @@ export function getExamStatus(exam) {
   }
   return 'Completed';
 }
+
+
 
 
 
