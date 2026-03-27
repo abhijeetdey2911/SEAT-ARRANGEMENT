@@ -6,12 +6,8 @@ function ExamCard({ exam }) {
   const navigate = useNavigate();
   const status = getExamStatus(exam);
 
-  const isViewMoreEnabled = status === 'Today';
-
   const handleViewMore = () => {
-    if (isViewMoreEnabled) {
-      navigate(`/exam/${exam.id}`);
-    }
+    navigate(`/student/exam/${exam.id}`);
   };
 
   return (
@@ -50,10 +46,9 @@ function ExamCard({ exam }) {
         <button
           type="button"
           className="btn btn-outline"
-          disabled={!isViewMoreEnabled}
           onClick={handleViewMore}
         >
-          View More
+          View Details
         </button>
       </footer>
     </article>
@@ -61,6 +56,8 @@ function ExamCard({ exam }) {
 }
 
 export default ExamCard;
+
+
 
 
 

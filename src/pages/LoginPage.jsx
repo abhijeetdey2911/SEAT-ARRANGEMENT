@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function LoginPage({ onLogin }) {
-  const [studentId, setStudentId] = useState('');
+function LoginPage({ role = 'student', onLogin, backPath = '/' }) {
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const roleText = role === 'admin' ? 'Admin' : 'Student';
+  const idLabel = role === 'admin' ? 'Admin ID' : 'Student ID';
+  const idPlaceholder = role === 'admin' ? 'admin01' : '25mca10005';
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (studentId && password) {
+    if (userId && password) {
       onLogin();
     }
   };
@@ -34,17 +40,17 @@ function LoginPage({ onLogin }) {
         <div className="auth-form-panel">
           <div className="auth-brand">VIT</div>
           <div className="auth-card">
-            <h1 className="auth-title">Student Login</h1>
+            <h1 className="auth-title">{roleText} Login</h1>
             <p className="auth-subtitle">Hey enter your details to sign in to your account.</p>
             <form className="auth-form" onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="studentId">Student ID</label>
+                <label htmlFor="userId">{idLabel}</label>
                 <input
-                  id="studentId"
+                  id="userId"
                   type="text"
-                  value={studentId}
-                  onChange={(e) => setStudentId(e.target.value)}
-                  placeholder="25mca10005"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  placeholder={idPlaceholder}
                   required
                 />
               </div>
@@ -66,6 +72,9 @@ function LoginPage({ onLogin }) {
               </div>
               <button type="submit" className="btn btn-primary auth-button">
                 Login
+              </button>
+              <button type="button" className="btn btn-outline auth-button" onClick={() => navigate(backPath)}>
+                Back
               </button>
             </form>
             <p className="auth-register">

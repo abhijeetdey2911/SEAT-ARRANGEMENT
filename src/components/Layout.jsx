@@ -1,51 +1,43 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
-function Layout({ student }) {
+function Layout({ title, subtitle, userName, userId, links, onLogout, showNav = true }) {
   return (
     <div className="app-shell">
       <header className="app-header">
         <div className="app-header-left">
           <div className="brand-mark">VIT</div>
           <div>
-            <h1 className="app-title">Exam Sitting Arrangement System</h1>
-            <p className="app-subtitle">Student Portal</p>
+            <h1 className="app-title">{title}</h1>
+            <p className="app-subtitle">{subtitle}</p>
           </div>
         </div>
         <div className="app-header-right">
           <div className="student-info">
-            <span className="student-name">{student?.name}</span>
-            <span className="student-roll">{student?.rollNo}</span>
+            <span className="student-name">{userName}</span>
+            <span className="student-roll">{userId}</span>
           </div>
+          <button type="button" className="btn btn-outline header-logout-btn" onClick={onLogout}>
+            Logout
+          </button>
         </div>
       </header>
 
-      <nav className="app-nav">
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            isActive ? 'nav-link nav-link-active' : 'nav-link'
-          }
-        >
-          Dashboard
-        </NavLink>
-        <NavLink
-          to="/admit-card"
-          className={({ isActive }) =>
-            isActive ? 'nav-link nav-link-active' : 'nav-link'
-          }
-        >
-          Admit Card
-        </NavLink>
-        <NavLink
-          to="/exam-routine"
-          className={({ isActive }) =>
-            isActive ? 'nav-link nav-link-active' : 'nav-link'
-          }
-        >
-          Exam Routine
-        </NavLink>
-      </nav>
+      {showNav && (
+        <nav className="app-nav">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) =>
+                isActive ? 'nav-link nav-link-active' : 'nav-link'
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+      )}
 
       <main className="app-main">
         <Outlet />
@@ -59,6 +51,8 @@ function Layout({ student }) {
 }
 
 export default Layout;
+
+
 
 
 

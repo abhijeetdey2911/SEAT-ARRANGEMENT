@@ -1,12 +1,13 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { mockExams, getExamStatus } from '../data/mockData.js';
+import SeatLayout from '../components/SeatLayout.jsx';
 
 function ExamDetailsPage() {
-  const { examId } = useParams();
+  const { subject } = useParams();
   const navigate = useNavigate();
 
-  const exam = mockExams.find((e) => e.id === examId);
+  const exam = mockExams.find((e) => e.id === subject);
 
   if (!exam) {
     return (
@@ -18,7 +19,7 @@ function ExamDetailsPage() {
         <button
           type="button"
           className="btn btn-outline"
-          onClick={() => navigate('/exam-routine')}
+          onClick={() => navigate('/student/exam-routine')}
         >
           Back to Exam Routine
         </button>
@@ -40,7 +41,7 @@ function ExamDetailsPage() {
       <button
         type="button"
         className="btn btn-outline back-button"
-        onClick={() => navigate('/exam-routine')}
+        onClick={() => navigate('/student/exam-routine')}
       >
         ← Back to Exam Routine
       </button>
@@ -102,11 +103,15 @@ function ExamDetailsPage() {
           <li>Follow all additional instructions given by the invigilator.</li>
         </ul>
       </article>
+
+      <SeatLayout yourSeatNumber={exam.seatNumber} />
     </section>
   );
 }
 
 export default ExamDetailsPage;
+
+
 
 
 

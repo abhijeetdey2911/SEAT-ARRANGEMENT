@@ -14,6 +14,16 @@ export const mockStudent = {
   rollNo: '25MCA10005',
   course: 'MCA',
   semester: '2th Semester',
+  examCenter: {
+    name: 'VIT Main Examination Center',
+    address: 'Block C, VIT Campus, Vellore',
+  },
+};
+
+export const mockAdmin = {
+  id: 'admin01',
+  password: 'admin1234',
+  name: 'Examination Cell Admin',
 };
 
 export const mockExams = [
@@ -81,6 +91,39 @@ export const mockExams = [
   },
 ];
 
+export const adminActions = [
+  {
+    id: 'upload-routine',
+    title: 'Upload Exam Routine',
+    description: 'Upload and publish semester-wise exam routine for students.',
+  },
+  {
+    id: 'manage-students',
+    title: 'Manage Students',
+    description: 'Add, edit, and delete student records and enrollment details.',
+  },
+  {
+    id: 'generate-seating',
+    title: 'Generate Seating Arrangement',
+    description: 'Generate room-wise seating plans for each exam session.',
+  },
+  {
+    id: 'view-layout',
+    title: 'View Seating Layout',
+    description: 'Review static room-wise seating visualization by classroom.',
+  },
+  {
+    id: 'download-reports',
+    title: 'Download Reports (PDF)',
+    description: 'Export attendance and seating summary reports as PDFs.',
+  },
+  {
+    id: 'logout',
+    title: 'Logout',
+    description: 'Sign out from the admin portal securely.',
+  },
+];
+
 export function getExamStatus(exam) {
   const examDate = new Date(exam.date);
   const todayDate = new Date(today.toISOString().split('T')[0]);
@@ -93,6 +136,8 @@ export function getExamStatus(exam) {
   }
   return 'Completed';
 }
+
+
 
 
 

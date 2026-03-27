@@ -17,7 +17,7 @@ function Dashboard() {
           <div className="card-grid">
             <article
               className="card dashboard-card"
-              onClick={() => navigate('/admit-card')}
+              onClick={() => navigate('/student/admit-card')}
             >
               <h3 className="card-title">Admit Card</h3>
               <p className="card-body-text">
@@ -31,7 +31,7 @@ function Dashboard() {
 
             <article
               className="card dashboard-card"
-              onClick={() => navigate('/exam-routine')}
+              onClick={() => navigate('/student/exam-routine')}
             >
               <h3 className="card-title">Exam Routine</h3>
               <p className="card-body-text">
