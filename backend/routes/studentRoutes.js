@@ -246,30 +246,4 @@ router.get("/layout", async (req, res) => {
   }
 });
 
-// ➤ Student login
-router.post("/login", async (req, res) => {
-  try {
-    const { rollNumber } = req.body;
-
-    const student = await Student.findOne({ rollNumber });
-
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    res.json({
-      name: student.name,
-      rollNumber: student.rollNumber,
-      department: student.department,
-      seatNumber: student.seatNumber,
-      benchNumber: student.benchNumber,
-      seatPosition: student.seatPosition,
-      classroom: student.classroom,
-      examTime: student.examTime,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 module.exports = router;
