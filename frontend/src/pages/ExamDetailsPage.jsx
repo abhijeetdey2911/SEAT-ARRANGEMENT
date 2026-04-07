@@ -1,110 +1,100 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { mockExams, getExamStatus } from '../data/mockData.js';
-import SeatLayout from '../components/SeatLayout.jsx';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import ClassroomSeatGrid from '../components/ClassroomSeatGrid.jsx';
 
-function ExamDetailsPage() {
+function ExamDetailsPage({ currentStudent }) {
   const { subject } = useParams();
   const navigate = useNavigate();
+  const [exam, setExam] = useState(null);
+  const [roomSeats, setRoomSeats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const exam = mockExams.find((e) => e.id === subject);
+  const subjectName = useMemo(() => decodeURIComponent(subject || ''), [subject]);
+
+  useEffect(() => {
+    const loadExamDetails = async () => {
+      if (!currentStudent?.rollNumber || !subjectName) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const seatingRes = await fetch(
+          `/api/seating/student/${encodeURIComponent(currentStudent.rollNumber)}`,
+        );
+        const allExams = seatingRes.ok ? await seatingRes.json() : [];
+        const selected = allExams.find(
+          (item) => item.subjectName.toLowerCase() === subjectName.toLowerCase(),
+        );
+
+        if (!selected) {
+          setExam(null);
+          return;
+        }
+
+        setExam(selected);
+
+        const layoutRes = await fetch(
+          `/api/seating/room/${encodeURIComponent(selected.roomNumber)}?subjectName=${encodeURIComponent(
+            selected.subjectName,
+          )}`,
+        );
+        const layoutData = layoutRes.ok ? await layoutRes.json() : [];
+        setRoomSeats(Array.isArray(layoutData) ? layoutData : []);
+      } catch (error) {
+        console.error('Failed to load exam details', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExamDetails();
+  }, [currentStudent, subjectName]);
+
+  if (loading) {
+    return <p className="page-subtitle">Loading exam details...</p>;
+  }
 
   if (!exam) {
     return (
       <section>
         <h2 className="page-title">Exam Not Found</h2>
-        <p className="page-subtitle">
-          The exam you are looking for does not exist or has been removed.
-        </p>
-        <button
-          type="button"
-          className="btn btn-outline"
-          onClick={() => navigate('/student/exam-routine')}
-        >
-          Back to Exam Routine
+        <button type="button" className="btn btn-outline" onClick={() => navigate('/student/dashboard')}>
+          Back to Dashboard
         </button>
       </section>
     );
   }
 
-  const status = getExamStatus(exam);
-  const today = new Date();
-  const examDate = new Date(exam.date);
-  const isAfterExam = examDate < today;
-  const attendance =
-    isAfterExam && status === 'Completed'
-      ? exam.attendanceStatus || 'Absent'
-      : 'Not Available';
-
   return (
     <section className="exam-details">
-      <button
-        type="button"
-        className="btn btn-outline back-button"
-        onClick={() => navigate('/student/exam-routine')}
-      >
-        ← Back to Exam Routine
+      <button type="button" className="btn btn-outline back-button" onClick={() => navigate('/student/dashboard')}>
+        ← Back to Dashboard
       </button>
-
       <h2 className="page-title">{exam.subjectName}</h2>
-      <p className="page-subtitle">
-        Detailed information about your seating arrangement and exam
-        instructions.
-      </p>
+      <p className="page-subtitle">Today&apos;s exam details and room layout.</p>
 
       <div className="details-layout">
-        <article className="card details-card">
+        <article className="card">
           <h3 className="section-title">Exam Information</h3>
-          <div className="detail-row">
-            <span className="label">Date</span>
-            <span>{exam.date}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Time</span>
-            <span>{exam.time}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Reporting Time</span>
-            <span>{exam.reportingTime}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Status</span>
-            <span>{status}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Attendance Status</span>
-            <span>{attendance}</span>
-          </div>
-        </article>
-
-        <article className="card details-card">
-          <h3 className="section-title">Seating Arrangement</h3>
-          <div className="detail-row">
-            <span className="label">Room Number</span>
-            <span>{exam.roomNumber}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Bench Number</span>
-            <span>{exam.benchNumber}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Seat Number</span>
-            <span>{exam.seatNumber}</span>
-          </div>
+          <div className="detail-row"><span className="label">Date</span><span>{exam.examDate}</span></div>
+          <div className="detail-row"><span className="label">Time</span><span>{exam.examTime}</span></div>
+          <div className="detail-row"><span className="label">Reporting Time</span><span>{exam.reportingTime || '-'}</span></div>
+          <div className="detail-row"><span className="label">Room Number</span><span>{exam.roomNumber}</span></div>
+          <div className="detail-row"><span className="label">Bench Number</span><span>{exam.benchNumber}</span></div>
+          <div className="detail-row"><span className="label">Seat Number</span><span>{exam.seatNumber}</span></div>
         </article>
       </div>
 
-      <article className="card instructions-card">
-        <h3 className="section-title">Exam Instructions</h3>
-        <ul className="instruction-list">
-          {exam.instructions.map((item, idx) => (
-            <li key={idx}>{item}</li>
-          ))}
-          <li>Follow all additional instructions given by the invigilator.</li>
-        </ul>
-      </article>
-
-      <SeatLayout yourSeatNumber={exam.seatNumber} />
+      <ClassroomSeatGrid
+        seats={roomSeats}
+        myBench={exam.benchNumber}
+        mySeat={exam.seatNumber}
+        totalRows={5}
+        totalColumns={6}
+        roomNumber={exam.roomNumber}
+      />
     </section>
   );
 }

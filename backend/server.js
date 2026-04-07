@@ -14,6 +14,9 @@ connectDB();
 
 // Routes
 app.use("/api/students", require("./routes/studentRoutes"));
+app.use("/api/exam-routine", require("./routes/examRoutineRoutes"));
+app.use("/api/examRoutine", require("./routes/examRoutineRoutes"));
+app.use("/api/seating", require("./routes/seatingRoutes"));
 
 // Student login route
 app.post("/api/login", async (req, res) => {
@@ -26,7 +29,6 @@ app.post("/api/login", async (req, res) => {
 
     const rollNumberTrimmed = rollNumber.trim();
 
-    // Debug logs
     console.log("Login attempt:", rollNumberTrimmed);
 
     // Case-insensitive exact match using regex
@@ -39,7 +41,13 @@ app.post("/api/login", async (req, res) => {
     console.log("Found student:", student);
 
     if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+      // No auth checks: allow login with any credentials for testing
+      return res.json({
+        name: "Guest Student",
+        rollNumber: rollNumberTrimmed,
+        department: "MCA",
+        exam: "Demo",
+      });
     }
 
     return res.json(student);

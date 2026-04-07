@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage.jsx';
 import RoleSelectionPage from './pages/RoleSelectionPage.jsx';
@@ -8,18 +8,27 @@ import AdmitCardPage from './pages/AdmitCardPage.jsx';
 import ExamRoutinePage from './pages/ExamRoutinePage.jsx';
 import ExamDetailsPage from './pages/ExamDetailsPage.jsx';
 import Layout from './components/Layout.jsx';
-import { mockStudent, mockAdmin } from './data/mockData.js';
 
 function App() {
   const [currentStudent, setCurrentStudent] = useState(null);
   const [currentAdmin, setCurrentAdmin] = useState(null);
 
-  const handleStudentLogin = () => {
-    setCurrentStudent(mockStudent);
+  // Optional health check to verify backend connection
+  useEffect(() => {
+    fetch('/api/students')
+      .then((res) => res.json())
+      .then((data) => console.log('Students Data:', data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const handleStudentLogin = (studentData) => {
+    setCurrentStudent(studentData);
   };
-  const handleAdminLogin = () => {
-    setCurrentAdmin(mockAdmin);
+
+  const handleAdminLogin = (adminData) => {
+    setCurrentAdmin(adminData);
   };
+
   const handleStudentLogout = () => setCurrentStudent(null);
   const handleAdminLogout = () => setCurrentAdmin(null);
 
@@ -78,7 +87,7 @@ function App() {
               title="Exam Sitting Arrangement System"
               subtitle="Student Portal"
               userName={currentStudent.name}
-              userId={currentStudent.rollNo}
+              userId={currentStudent.rollNumber}
               onLogout={handleStudentLogout}
               showNav={false}
               links={[
@@ -92,10 +101,10 @@ function App() {
           )
         }
       >
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard currentStudent={currentStudent} />} />
         <Route path="admit-card" element={<AdmitCardPage student={currentStudent} />} />
         <Route path="exam-routine" element={<ExamRoutinePage />} />
-        <Route path="exam/:subject" element={<ExamDetailsPage />} />
+        <Route path="exam/:subject" element={<ExamDetailsPage currentStudent={currentStudent} />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -104,10 +113,4 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
 

@@ -4,16 +4,73 @@ import { useNavigate } from 'react-router-dom';
 function LoginPage({ role = 'student', onLogin, backPath = '/' }) {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const roleText = role === 'admin' ? 'Admin' : 'Student';
-  const idLabel = role === 'admin' ? 'Admin ID' : 'Student ID';
+  const idLabel = role === 'admin' ? 'Admin ID' : 'Student Roll Number';
   const idPlaceholder = role === 'admin' ? 'admin01' : '25mca10005';
 
-  const handleSubmit = (e) => {
+  const handleStudentLogin = async () => {
+    const rollNumber = userId.trim() || 'guest';
+    const passwordValue = password || 'guest';
+
+    const fallbackStudent = {
+      name: 'Guest Student',
+      rollNumber,
+      department: 'MCA',
+      exam: 'Demo',
+    };
+
+    try {
+      setLoading(true);
+
+      console.log("Sending roll:", rollNumber);
+
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rollNumber,
+          password: passwordValue,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // No auth mode: fallback to local login
+        onLogin(fallbackStudent);
+        return;
+      }
+
+      onLogin(data);
+    } catch (error) {
+      console.error('Login error', error);
+      // Backend unavailable -> still allow login
+      onLogin(fallbackStudent);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAdminLogin = () => {
+    // Simple admin mock; can be wired to real backend later
+    if (!userId || !password) {
+      alert('Please enter admin ID and password');
+      return;
+    }
+    onLogin({ id: userId, name: 'Admin' });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (userId && password) {
-      onLogin();
+    if (role === 'student') {
+      await handleStudentLogin();
+    } else {
+      handleAdminLogin();
     }
   };
 
@@ -70,8 +127,8 @@ function LoginPage({ role = 'student', onLogin, backPath = '/' }) {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary auth-button">
-                Login
+              <button type="submit" className="btn btn-primary auth-button" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
               </button>
               <button type="button" className="btn btn-outline auth-button" onClick={() => navigate(backPath)}>
                 Back
